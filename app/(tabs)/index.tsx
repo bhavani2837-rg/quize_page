@@ -1,6 +1,5 @@
 import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import 'expo-router/entry-classic';
 import React, { useState } from "react";
 import {
   SafeAreaView,
