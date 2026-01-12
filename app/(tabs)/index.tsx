@@ -2,6 +2,7 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
+  Platform,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -9,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
 /* ================= TYPES ================= */
 type Question = {
   id: number;
@@ -17,6 +19,7 @@ type Question = {
   correctIndex: number;
   marks: number;
 };
+
 /* ================= DUMMY DATA ================= */
 const QUESTIONS: Question[] = [
   {
@@ -40,12 +43,13 @@ const QUESTIONS: Question[] = [
     marks: 1,
   },
 ];
+
 /* ================= QUIZ SCREEN ================= */
 const QuizScreen: React.FC = () => {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const navigation = useNavigation(); // Navigation hook
+  const navigation = useNavigation();
   const answeredCount = Object.keys(answers).length;
 
   const selectOption = (qId: number, index: number) => {
@@ -72,7 +76,7 @@ const QuizScreen: React.FC = () => {
           onPress={() => navigation.goBack()}
           style={styles.arrowBtn}
         >
-          <Feather name="arrow-left" size={28} color="#1e3a8a" />
+          <Feather name="arrow-left" size={26} color="#1e3a8a" />
         </TouchableOpacity>
         <Text style={styles.title}>Bodha UPSC – Daily Quiz</Text>
       </View>
@@ -97,17 +101,15 @@ const QuizScreen: React.FC = () => {
               const selected = answers[q.id] === idx;
               const isCorrect = idx === q.correctIndex;
 
-              const optionStyles = [
-                styles.option,
-                !submitted && selected && styles.selected,
-                submitted && isCorrect && styles.correct,
-                submitted && selected && !isCorrect && styles.wrong,
-              ];
-
               return (
                 <TouchableOpacity
                   key={idx}
-                  style={optionStyles}
+                  style={[
+                    styles.option,
+                    !submitted && selected && styles.selected,
+                    submitted && isCorrect && styles.correct,
+                    submitted && selected && !isCorrect && styles.wrong,
+                  ]}
                   onPress={() => selectOption(q.id, idx)}
                 >
                   <Text style={styles.optionText}>
@@ -134,7 +136,7 @@ const QuizScreen: React.FC = () => {
         <View style={{ height: 90 }} />
       </ScrollView>
 
-      {/* ================= STICKY FOOTER ================= */}
+      {/* ================= FOOTER ================= */}
       <View style={styles.footer}>
         {!submitted ? (
           <TouchableOpacity
@@ -161,44 +163,96 @@ const QuizScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
+
 /* ================= STYLES ================= */
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#f4f6f8" },
+
   header: {
     flexDirection: "row",
     alignItems: "center",
     padding: 16,
     backgroundColor: "#fff",
   },
+
   arrowBtn: {
     padding: 6,
     borderRadius: 50,
     backgroundColor: "#e0e7ff",
     marginRight: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
-    elevation: 3,
+
+    // ✅ Web-safe shadow
+    ...(Platform.OS === "web"
+      ? { boxShadow: "0px 2px 6px rgba(0,0,0,0.25)" }
+      : { elevation: 4 }),
   },
+
   title: { fontSize: 18, fontWeight: "bold" },
-  progress: { paddingHorizontal: 16, paddingBottom: 6, fontSize: 12, color: "#555" },
+
+  progress: {
+    paddingHorizontal: 16,
+    paddingBottom: 6,
+    fontSize: 12,
+    color: "#555",
+  },
+
   container: { padding: 16 },
-  card: { backgroundColor: "#fff", padding: 14, borderRadius: 10, marginBottom: 14 },
-  qHeader: { flexDirection: "row", justifyContent: "space-between", marginBottom: 10 },
+
+  card: {
+    backgroundColor: "#fff",
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 14,
+  },
+
+  qHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+
   question: { fontWeight: "600", flex: 1, marginRight: 8 },
   mark: { fontSize: 12, color: "#666" },
-  option: { borderWidth: 1, borderColor: "#ddd", padding: 12, borderRadius: 8, marginVertical: 5 },
+
+  option: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 5,
+  },
+
   optionText: { fontSize: 14 },
+
   selected: { borderColor: "#1e3a8a", backgroundColor: "#eef2ff" },
   correct: { borderColor: "#2e7d32", backgroundColor: "#e8f5e9" },
   wrong: { borderColor: "#c62828", backgroundColor: "#fdecea" },
+
   reviewText: { marginTop: 8, fontSize: 12, color: "#333" },
-  footer: { padding: 12, borderTopWidth: 1, borderTopColor: "#eee", backgroundColor: "#fff" },
-  primaryBtn: { backgroundColor: "#1e3a8a", padding: 14, borderRadius: 8, alignItems: "center" },
+
+  footer: {
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#eee",
+    backgroundColor: "#fff",
+  },
+
+  primaryBtn: {
+    backgroundColor: "#1e3a8a",
+    padding: 14,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+
   disabledBtn: { backgroundColor: "#9fa8da" },
+
   btnText: { color: "#fff", fontWeight: "600" },
-  total: { textAlign: "center", fontWeight: "600", marginBottom: 8 },
+
+  total: {
+    textAlign: "center",
+    fontWeight: "600",
+    marginBottom: 8,
+  },
 });
 
 export default QuizScreen;
